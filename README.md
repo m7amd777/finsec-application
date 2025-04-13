@@ -26,8 +26,7 @@ This is a realistic, intentionally broken mobile app designed to test your penet
 ```
 finsec-api/
 ├── backend/          # Backend API code
-├── mobile/           # Mobile frontend code
-└── docker-compose.yml
+└── mobile/           # Mobile frontend code
 ```
 
 ## Setup and Running the Application
