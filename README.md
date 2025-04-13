@@ -1,4 +1,4 @@
-# FinSec App
+# Vulnerable Mobile Application for Security Hackathon
 
 Vulnerable Mobile Application for Security Hackathon
 
