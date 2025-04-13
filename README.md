@@ -24,6 +24,7 @@ finsec-api/
 1. Open the project in GitHub Codespaces
 2. Navigate to the project directory:
    ```bash
+   chmod -R 755 ./
    cd finsec-api
    ```
 3. Start the Docker containers:
@@ -44,6 +45,7 @@ finsec-api/
 3. Update the API URL in `mobile/config/api.ts` with the URL copied from step 5
 4. Install dependencies and start the development server:
    ```bash
+   npm install
    npm run dev
    ```
 5. Make the mobile frontend port public in Codespaces
