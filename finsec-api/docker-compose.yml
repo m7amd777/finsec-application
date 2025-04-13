@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./finsec_api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./finsec_api:/app
+    environment:
+      - FLASK_APP=app/__init__.py
+      - FLASK_ENV=development
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3307
+      - MYSQL_USER=finsec_user
+      - MYSQL_PASSWORD=finsec_password
+      - MYSQL_DB=finsec_db
+      - JWT_SECRET_KEY=your_jwt_secret_key_change_in_production
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  db:
+    image: mysql:8.0
+    command: >
+      bash -c '
+        echo "[mysqld]
+        bind-address = 0.0.0.0
+        port = 3307
+        default-authentication-plugin = mysql_native_password
+        skip-host-cache
+        skip-name-resolve
+        socket = /var/run/mysqld/mysqld.sock
+
+        [client]
+        port = 3307
+        default-character-set = utf8mb4
+
+        [mysql]
+        port = 3307
+        default-character-set = utf8mb4" > /etc/mysql/conf.d/custom.cnf &&
+        chmod 644 /etc/mysql/conf.d/custom.cnf &&
+        docker-entrypoint.sh mysqld
+      '
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-root.sql:/docker-entrypoint-initdb.d/1-init-root.sql:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=finsec_db
+      - MYSQL_USER=finsec_user
+      - MYSQL_PASSWORD=finsec_password
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_TCP_PORT=3307
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3307", "-u", "root", "-proot_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

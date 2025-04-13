@@ -1,0 +1,975 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "FinSec Banking API",
+    "description": "A secure banking API with authentication and financial management capabilities",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "url": "http://www.example.com/support",
+      "email": "support@example.com"
+    }
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check endpoint",
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "example": "healthy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bills": {
+      "get": {
+        "tags": ["Bills"],
+        "summary": "Get user's bills",
+        "description": "Retrieves all bills for the authenticated user",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "List of bills",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bills": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Electricity Bill"
+                      },
+                      "category": {
+                        "type": "string",
+                        "example": "Utilities"
+                      },
+                      "amount": {
+                        "type": "number",
+                        "example": 150.50
+                      },
+                      "dueDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-04-15T00:00:00Z"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": ["upcoming", "overdue", "paid"],
+                        "example": "upcoming"
+                      },
+                      "autopay": {
+                        "type": "boolean",
+                        "example": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/bills/pay": {
+      "post": {
+        "tags": ["Bills"],
+        "summary": "Pay a bill",
+        "description": "Process payment for a specific bill",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["billId", "amount", "paymentMethodId"],
+              "properties": {
+                "billId": {
+                  "type": "string",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "amount": {
+                  "type": "number",
+                  "example": 150.50
+                },
+                "paymentMethodId": {
+                  "type": "string",
+                  "example": "pm_123456789"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bill payment successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Bill paid successfully"
+                },
+                "bill": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Electricity Bill"
+                    },
+                    "category": {
+                      "type": "string",
+                      "example": "Utilities"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "example": 150.50
+                    },
+                    "dueDate": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-04-15T00:00:00Z"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "paid"
+                    },
+                    "autopay": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - Missing fields or amount mismatch"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "404": {
+            "description": "Bill not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login endpoint",
+        "description": "Authenticate user with email and password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email", "password"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User's email address"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "User's password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "access_token": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing credentials"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "403": {
+            "description": "Account is inactive"
+          }
+        }
+      }
+    },
+    "/api/users/profile": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user profile",
+        "description": "Get the authenticated user's profile information",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "integer"},
+                "firstName": {"type": "string"},
+                "lastName": {"type": "string"},
+                "email": {"type": "string"},
+                "preferredName": {"type": "string"},
+                "phone": {"type": "string"},
+                "address": {"type": "string"},
+                "memberSince": {"type": "string"},
+                "status": {"type": "string"}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update user profile",
+        "description": "Update the authenticated user's profile information",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {"type": "string"},
+                "lastName": {"type": "string"},
+                "preferredName": {"type": "string"},
+                "phone": {"type": "string"},
+                "address": {"type": "string"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/cards": {
+      "get": {
+        "tags": ["Cards"],
+        "summary": "Get user cards",
+        "description": "Get all cards for the authenticated user",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Cards retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cards": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {"type": "string"},
+                      "cardHolder": {"type": "string"},
+                      "cardNumber": {"type": "string"},
+                      "expiryDate": {"type": "string"},
+                      "cardType": {"type": "string"},
+                      "balance": {"type": "number"},
+                      "bankName": {"type": "string"},
+                      "rewardsPoints": {"type": "integer"},
+                      "cardNetwork": {"type": "string"}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/cards/{card_id}": {
+      "get": {
+        "tags": ["Cards"],
+        "summary": "Get card details",
+        "description": "Get detailed information for a specific card",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the card to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card details retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string"},
+                "cardHolder": {"type": "string"},
+                "cardNumber": {"type": "string"},
+                "expiryDate": {"type": "string"},
+                "cardType": {"type": "string"},
+                "balance": {"type": "number"},
+                "transactions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {"type": "string"},
+                      "amount": {"type": "number"},
+                      "merchant": {"type": "string"},
+                      "category": {"type": "string"},
+                      "status": {"type": "string"},
+                      "createdAt": {"type": "string"}
+                    }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "daily": {"type": "number"},
+                    "monthly": {"type": "number"},
+                    "remaining": {
+                      "type": "object",
+                      "properties": {
+                        "daily": {"type": "number"},
+                        "monthly": {"type": "number"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card not found"
+          }
+        }
+      }
+    },
+    "/api/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transactions",
+        "description": "Get transactions with filters",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "dateRange",
+            "in": "query",
+            "type": "string",
+            "enum": ["all", "today", "week", "month"],
+            "description": "Filter transactions by date range"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string",
+            "enum": ["all", "debit", "credit"],
+            "description": "Filter transactions by type"
+          },
+          {
+            "name": "minAmount",
+            "in": "query",
+            "type": "number",
+            "description": "Minimum transaction amount"
+          },
+          {
+            "name": "maxAmount",
+            "in": "query",
+            "type": "number",
+            "description": "Maximum transaction amount"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string",
+            "description": "Search in merchant name or category"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1,
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10,
+            "maximum": 50,
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transactions retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "transactions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {"type": "string"},
+                      "type": {"type": "string"},
+                      "amount": {"type": "number"},
+                      "date": {"type": "string"},
+                      "category": {"type": "string"},
+                      "merchant": {"type": "string"},
+                      "status": {"type": "string"},
+                      "paymentMethod": {"type": "string"}
+                    }
+                  }
+                },
+                "pagination": {
+                  "type": "object",
+                  "properties": {
+                    "total": {"type": "integer"},
+                    "page": {"type": "integer"},
+                    "limit": {"type": "integer"},
+                    "pages": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/transactions/{transaction_id}": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transaction details",
+        "description": "Get detailed information for a specific transaction",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "transaction_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the transaction to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "amount": {"type": "number"},
+                "date": {"type": "string"},
+                "description": {"type": "string"},
+                "category": {"type": "string"},
+                "merchant": {"type": "string"},
+                "reference": {"type": "string"},
+                "status": {"type": "string"},
+                "paymentMethod": {"type": "string"}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        }
+      }
+    },
+    "/api/auth/generate-mfa-secret": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Generate MFA Secret",
+        "description": "Generates a new MFA secret and QR code URL for the specified user.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["userId"],
+              "properties": {
+                "userId": {
+                  "type": "string",
+                  "example": "2"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "MFA Secret generated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "secret": {
+                  "type": "string",
+                  "example": "JBSWY3DPEHPK3PXP"
+                },
+                "qrCodeUrl": {
+                  "type": "string",
+                  "example": "otpauth://totp/FinSec:2?secret=JBSWY3DPEHPK3PXP&issuer=FinSec"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request payload"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-mfa": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify MFA Code",
+        "description": "Verifies the MFA code along with user credentials to complete login.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["userId", "otpCode", "email", "password"],
+              "properties": {
+                "userId": {
+                  "type": "string",
+                  "example": ""
+                },
+                "otpCode": {
+                  "type": "string",
+                  "example": ""
+                },
+                "email": {
+                  "type": "string",
+                  "example": ""
+                },
+                "password": {
+                  "type": "string",
+                  "example": ""
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "MFA verification successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "MFA verified successfully"
+                },
+                "access_token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid MFA code"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Invalid credentials or MFA verification failed"
+          }
+        }
+      }
+    },
+    "/api/analytics/spending": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get spending analytics",
+        "description": "Get spending analytics based on the specified period",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "type": "string",
+            "enum": ["week", "month", "year"],
+            "default": "month",
+            "description": "Time period for the analytics"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Spending analytics retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "categories": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Food & Dining"
+                      },
+                      "amount": {
+                        "type": "number",
+                        "example": 250.75
+                      },
+                      "percentage": {
+                        "type": "number",
+                        "example": 32.5
+                      },
+                      "transactions": {
+                        "type": "integer",
+                        "example": 8
+                      },
+                      "monthlyChange": {
+                        "type": "number",
+                        "example": 5.2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid period parameter"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get notifications",
+        "description": "Get all notifications for the authenticated user",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "List of notifications",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notifications": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                      },
+                      "title": {
+                        "type": "string",
+                        "example": "Large Transaction Alert"
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "A transaction of $200.00 was made at Best Buy."
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["transaction", "security", "promotion", "system"],
+                        "example": "transaction"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-04-05T18:30:00Z"
+                      },
+                      "read": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "action_url": {
+                        "type": "string",
+                        "example": "/transactions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          }
+        }
+      }
+    },
+    "/api/notifications/settings": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get notification settings",
+        "description": "Get notification settings for the authenticated user",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Notification settings",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pushEnabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "emailEnabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "categories": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "security": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "promotions": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Notifications"],
+        "summary": "Update notification settings",
+        "description": "Update notification settings for the authenticated user",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pushEnabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "emailEnabled": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "categories": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "security": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "promotions": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification settings updated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pushEnabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "emailEnabled": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "categories": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "security": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "promotions": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/notifications/{notification_id}/read": {
+      "put": {
+        "tags": ["Notifications"],
+        "summary": "Mark notification as read",
+        "description": "Mark a notification as read",
+        "security": [{"Bearer": []}],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the notification to mark as read"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marked as read",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Notification marked as read"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Notification not found"
+          }
+        }
+      }
+    }
+  }
+} 

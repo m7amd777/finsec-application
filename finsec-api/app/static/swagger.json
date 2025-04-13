@@ -1,0 +1,445 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "FinSec Banking API",
+    "version": "1.0.0",
+    "description": "API for managing banking operations",
+    "contact": {
+      "name": "API Support",
+      "url": "http://www.example.com/support",
+      "email": "support@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check endpoint",
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login endpoint",
+        "description": "Authenticate user with email and password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User's email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful"
+                    },
+                    "access_token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "user@example.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing credentials"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "403": {
+            "description": "Account is inactive"
+          }
+        }
+      }
+    },
+    "/api/auth/generate-mfa-secret": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Generate MFA secret",
+        "description": "Generate a new MFA secret for the user to set up 2FA",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "description": "User ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MFA secret generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "MFA secret generated successfully"
+                    },
+                    "mfa_secret": {
+                      "type": "string",
+                      "description": "Base32 encoded secret key",
+                      "example": "JBSWY3DPEHPK3PXP"
+                    },
+                    "totp_uri": {
+                      "type": "string",
+                      "description": "QR code URL for easy setup",
+                      "example": "otpauth://totp/FinSec:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=FinSec"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing user ID"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-mfa": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify MFA code",
+        "description": "Verify the MFA code during login or when enabling 2FA",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "otpCode", "email", "password"],
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "description": "User ID",
+                    "example": 1
+                  },
+                  "otpCode": {
+                    "type": "string",
+                    "description": "6-digit OTP code",
+                    "example": "123456"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "User's email address",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's password",
+                    "example": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MFA verification successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "MFA verification successful"
+                    },
+                    "access_token": {
+                      "type": "string",
+                      "description": "JWT token (only provided during login)",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "session_id": {
+                      "type": "string",
+                      "description": "Session ID",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "user": {
+                      "type": "object",
+                      "description": "User information (only provided during login)",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "user@example.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing fields"
+          },
+          "401": {
+            "description": "Invalid credentials or OTP code"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/bills": {
+      "get": {
+        "tags": ["Bills"],
+        "summary": "Get user's bills",
+        "description": "Retrieves all bills for the authenticated user",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of bills",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "bills": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Electricity Bill"
+                          },
+                          "category": {
+                            "type": "string",
+                            "example": "Utilities"
+                          },
+                          "amount": {
+                            "type": "number",
+                            "example": 150.50
+                          },
+                          "dueDate": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2024-04-15T00:00:00Z"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["upcoming", "overdue", "paid"],
+                            "example": "upcoming"
+                          },
+                          "autopay": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/bills/pay": {
+      "post": {
+        "tags": ["Bills"],
+        "summary": "Pay a bill",
+        "description": "Process payment for a specific bill",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["billId", "amount", "paymentMethodId"],
+                "properties": {
+                  "billId": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 150.50
+                  },
+                  "paymentMethodId": {
+                    "type": "string",
+                    "example": "pm_123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bill payment successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Bill paid successfully"
+                    },
+                    "bill": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "123e4567-e89b-12d3-a456-426614174000"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Electricity Bill"
+                        },
+                        "category": {
+                          "type": "string",
+                          "example": "Utilities"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 150.50
+                        },
+                        "dueDate": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-04-15T00:00:00Z"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "paid"
+                        },
+                        "autopay": {
+                          "type": "boolean",
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - Missing fields or amount mismatch"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "404": {
+            "description": "Bill not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+} 
