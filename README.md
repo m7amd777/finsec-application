@@ -1,6 +1,21 @@
 # FinSec App
 
-A financial security application with a backend API and mobile frontend.
+Vulnerable Mobile Application for Security Hackathon
+
+Welcome to the official repository for our Security Hackathon Challenge App!
+
+This mobile application has been intentionally developed with multiple security vulnerabilities and misconfigurations across its entire stack — from insecure coding practices to poor configuration choices. It is designed specifically for educational and ethical hacking purposes within the scope of our hackathon event.
+
+## 🎯 Purpose
+
+The goal of this application is to challenge participants to:
+
+- Analyze the app from a security perspective
+- Identify and document all potential vulnerabilities
+- Suggest effective remediations and security best practices
+- Learn about common mobile security pitfalls through hands-on experience
+
+This is a realistic, intentionally broken mobile app designed to test your penetration testing, reverse engineering, and secure development skills.
 
 ## Prerequisites
 
@@ -74,20 +89,17 @@ The following test accounts are available for testing the application:
 | Tariq      | El-Sayed    | tariq.el-sayed@example.com   | password123 |
 | Mona       | Abdelrahman | mona.abdelrahman@example.com | password123 |
 
+## ⚠️ Disclaimer
+
+This application is not meant for production and should only be used in a controlled environment for ethical hacking and learning purposes.
+Please do not reuse or repurpose this code in real-world applications.
+
+## License
+
+This project was developed for the BBK Finsec Hackathon.
+
 ## Troubleshooting
 
 - If Docker containers fail to start, ensure all ports are available
 - If the mobile frontend can't connect to the backend, verify the API URL in `mobile/config/api.ts`
 - For Codespaces issues, check GitHub documentation for troubleshooting steps
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project was developed for the BBK Finsec Hackathon.
