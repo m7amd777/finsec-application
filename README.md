@@ -1,4 +1,4 @@
-# FinSec API
+# FinSec App
 
 A financial security application with a backend API and mobile frontend.
 
@@ -90,4 +90,4 @@ The following test accounts are available for testing the application:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project was developed for the BBK Finsec Hackathon.
