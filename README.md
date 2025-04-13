@@ -1,7 +1,5 @@
 # Vulnerable Mobile Application for Security Hackathon
 
-Vulnerable Mobile Application for Security Hackathon
-
 Welcome to the official repository for our Security Hackathon Challenge App!
 
 This mobile application has been intentionally developed with multiple security vulnerabilities and misconfigurations across its entire stack — from insecure coding practices to poor configuration choices. It is designed specifically for educational and ethical hacking purposes within the scope of our hackathon event.
