@@ -86,6 +86,13 @@ The following test accounts are available for testing the application:
 | Tariq      | El-Sayed    | tariq.el-sayed@example.com   | password123 |
 | Mona       | Abdelrahman | mona.abdelrahman@example.com | password123 |
 
+## Pages Without Backend APIs
+
+The following pages are included in the application but do not have backend API implementations and are considered out of scope:
+
+- Send Money functionality
+- Other pages that may be present in the UI but lack backend integration
+
 ## ⚠️ Disclaimer
 
 This application is not meant for production and should only be used in a controlled environment for ethical hacking and learning purposes.
