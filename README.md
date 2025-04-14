@@ -88,7 +88,7 @@ The following test accounts are available for testing the application:
 
 ## ⚠️ Pages Without Backend APIs
 
-Pages that do not rely on backend APIs (e.g., Send Money) are considered out of scope.
+Pages that do not connected to backend APIs (e.g., Send Money) are considered out of scope.
 
 ## ⚠️ Disclaimer
 
